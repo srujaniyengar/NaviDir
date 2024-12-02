@@ -1,6 +1,7 @@
 #include "file_manager.h"
 #include <cstdio>
 #include <filesystem>
+#include <fstream>
 #include <string>
 #include <variant>
 #include <vector>
@@ -8,7 +9,37 @@
 using namespace std::filesystem;
 using namespace std;
 
+void FileManager::updateChildren(vector<directory_entry> *vec, path path) {
+  vec->clear();
+  for (const auto& entry : directory_iterator(path)) {
+    vec->push_back(entry);
+  }
+}
+
 void FileManager::updateSelectedData() {
+  directory_entry selectedEntry (selectedPath);
+  if (selectedEntry.is_directory()) {
+    if (!holds_alternative<vector<directory_entry>>(selectedData)) {
+      selectedData = vector<directory_entry>();
+    }
+    updateChildren(&get<vector<directory_entry>>(selectedData), selectedPath);
+  } else {
+    ifstream file (selectedPath);
+    if (!file) {
+      selectedData = "Unable to open file!";
+      return;
+    }
+    if (!holds_alternative<string>(selectedData)) {
+      selectedData = string();
+    }
+    string line;
+    string content = get<string>(selectedData);
+    content.clear();
+    while (getline(file, line)) {
+      content += line + "\n";
+    }
+    selectedData = content;
+  }
 }
 
 FileManager::FileManager() {
@@ -118,7 +149,7 @@ path FileManager::switchPath() {
   currentPath = selectedPath;
   children.clear();
   int selectedIndex = -1;
-  for (const auto& entry : directory_iterator(currentPath)) {
+  for (const auto& entry : directory_iterator(currentPath)) { //todo: use updateChildren function instead
     children.push_back(entry);
     if (entry.path() == selectedPath) {
       selectedIndex = children.size() - 1;

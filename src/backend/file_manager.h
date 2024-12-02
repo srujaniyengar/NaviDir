@@ -15,6 +15,8 @@ private:
 
   std::variant<std::vector<std::filesystem::directory_entry>, std::string> selectedData;
 
+  void updateChildren(std::vector<std::filesystem::directory_entry>*, std::filesystem::path path);
+
   void updateSelectedData();
 
 public:
