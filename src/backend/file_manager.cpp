@@ -18,6 +18,14 @@ path FileManager::getCurrentPath() {
   return currentPath;
 }
 
+vector<directory_entry> FileManager::getChildren() {
+  return children;
+}
+
+directory_entry FileManager::getSelectedItem() {
+  return directory_entry(selectedPath);
+}
+
 path FileManager::getSelectedPath() {
   return selectedPath;
 }
@@ -119,3 +127,5 @@ path FileManager::switchToParent() {
   }
   return currentPath;
 }
+
+FileManager::~FileManager() {}
