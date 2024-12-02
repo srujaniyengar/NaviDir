@@ -1,13 +1,18 @@
 #include "file_manager.h"
 #include <cstdio>
 #include <filesystem>
+#include <string>
+#include <variant>
 #include <vector>
 
 using namespace std::filesystem;
 using namespace std;
 
+void FileManager::updateSelectedData() {
+}
+
 FileManager::FileManager() {
-  FileManager(path("."));
+  FileManager(path(current_path()));
 }
 
 FileManager::FileManager(path path) {
@@ -38,7 +43,7 @@ bool FileManager::selectPath(path path, bool skipCheck=false) {
       }
     }
   }
-  if (path == selectedPath || path.empty()) {
+  if (path == selectedPath || ! exists(path)) {
     return false;
   }
   selectedPath = path;
@@ -51,6 +56,7 @@ bool FileManager::selectPath() {
     return false;
   }
   selectedPath = children[selected].path();
+  updateSelectedData();
   return true;
 }
 
@@ -95,6 +101,10 @@ bool FileManager::selectParentDir() {
     return selectedPath == currentPath.parent_path();
   }
   return selectPath(currentPath.parent_path(), true);
+}
+
+variant<vector<directory_entry>, string> FileManager::getSelectedData() {
+  return selectedData;
 }
 
 path FileManager::switchPath(path path) {

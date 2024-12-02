@@ -15,6 +15,8 @@ private:
 
   std::variant<std::vector<std::filesystem::directory_entry>, std::string> selectedData;
 
+  void updateSelectedData();
+
 public:
   FileManager(); //constructor, initializes at current directory
   FileManager(std::filesystem::path); //constructor, initializes at given directory
@@ -33,7 +35,7 @@ public:
   bool decrementSelected(bool); //selects previous file in the current directory
   bool selectParentDir(); //selects the parent directory
   
-  /*std::variant<std::vector<std::filesystem::directory_entry>, std::string> getSelectedData();*/
+  std::variant<std::vector<std::filesystem::directory_entry>, std::string> getSelectedData();
 
   std::filesystem::path switchPath(std::filesystem::path); //switchs to given directory
   std::filesystem::path switchPath(); //switches to selected directory (selectedPath)
