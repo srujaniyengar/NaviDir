@@ -1,7 +1,4 @@
-add_library(backend STATIC
-    file_manager.cpp
-    file_manager.h
-)
+add_library(Backend file_manager.cpp)
 
-target_include_directories(backend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(Backend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

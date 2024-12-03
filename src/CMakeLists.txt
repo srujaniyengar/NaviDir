@@ -1,11 +1,10 @@
+set(SRC_FILES main.cpp)
+
 add_subdirectory(backend)
 add_subdirectory(frontend)
 
-add_executable(NaviDir main.cpp)
+include_directories(backend frontend)
 
-target_link_libraries(NaviDir PRIVATE backend)
-target_link_libraries(NaviDir PRIVATE frontend)
+add_executable(NaviDir ${SRC_FILES})
 
-set_target_properties(NaviDir PROPERTIES 
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-)
+target_link_libraries(NaviDir PRIVATE Backend Frontend)
