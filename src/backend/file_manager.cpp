@@ -1,172 +1,196 @@
 #include "file_manager.h"
+#include <cstddef>
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
 #include <string>
-#include <variant>
 #include <vector>
 
 using namespace std::filesystem;
 using namespace std;
 
-void FileManager::updateChildren(vector<directory_entry> *vec, path path) {
-  vec->clear();
-  for (const auto& entry : directory_iterator(path)) {
-    vec->push_back(entry);
+void FileManager::updateFiles(vector<directory_entry>& vec, const directory_entry& entry) { //clears the vector and fills it with files from given directory
+  vec.clear();
+  if (! entry.is_directory()) {
+    return;
+  }
+  for (const auto& entry : directory_iterator(entry)) {
+    vec.push_back(entry);
   }
 }
 
-void FileManager::updateSelectedData() {
-  directory_entry selectedEntry (selectedPath);
-  if (selectedEntry.is_directory()) {
-    if (!holds_alternative<vector<directory_entry>>(selectedData)) {
-      selectedData = vector<directory_entry>();
-    }
-    updateChildren(&get<vector<directory_entry>>(selectedData), selectedPath);
-  } else {
-    ifstream file (selectedPath);
+void FileManager::updateFiles(vector<directory_entry>& vec, const path& path) { //calls updateFiles(vector<directory_entry>&, directory_entry&) with directory_entry
+  directory_entry entry(path);
+  updateFiles(vec, entry);
+}
+
+void FileManager::updateSelectedData() { //updates selectedFileChildren or selectedFileContent depending on selectedFile type
+  if (selectedFile->is_directory()) {
+    updateFiles(*selectedFileChildren, (selectedFile->path())); //fills the vector with files if selectedFile is a directory
+  } else { //writes the content of selectedFile to selectedFileContent if it is not a directory
+    ifstream file (selectedFile->path());
     if (!file) {
-      selectedData = "Unable to open file!";
+      *selectedFileContent = "Unable to open file!";
       return;
     }
-    if (!holds_alternative<string>(selectedData)) {
-      selectedData = string();
-    }
-    string line;
-    string content = get<string>(selectedData);
-    content.clear();
+    string content, line;
     while (getline(file, line)) {
       content += line + "\n";
     }
-    selectedData = content;
+    *selectedFileContent = content;
   }
 }
 
-FileManager::FileManager() {
-  FileManager(path(current_path()));
+FileManager::FileManager(directory_entry& entry) { //calls switchPath and initializes class in given directory
+  switchPath(entry);
 }
 
-FileManager::FileManager(path path) {
-  switchPath(path);
+FileManager::FileManager() { //class constructor to initializes class in PWD
+  FileManager(current_path());
 }
 
-path FileManager::getCurrentPath() {
-  return currentPath;
+FileManager::FileManager(path& path) { //calls switchPath and initializes class in given path
+  directory_entry entry(path);
+  FileManager(entry=entry);
 }
 
-vector<directory_entry> FileManager::getChildren() {
-  return children;
+const path& FileManager::getCurrentPath() { //returns currentPath
+  return *currentPath;
 }
 
-directory_entry FileManager::getSelectedItem() {
-  return directory_entry(selectedPath);
+vector<directory_entry*>::const_iterator FileManager::filesBegin() { //returns cbegin of currentFilesFiltered
+  return currentFilesFiltered->cbegin();
 }
 
-path FileManager::getSelectedPath() {
-  return selectedPath;
+vector<directory_entry*>::const_iterator FileManager::filesEnd() { //returns cend of currentFilesFiltered
+  return currentFilesFiltered->cend();
 }
 
-bool FileManager::selectPath(path path, bool skipCheck=false) {
+const directory_entry& FileManager::getSelectedFile() { //returns selectedFile
+  return *selectedFile;
+}
+
+bool FileManager::selectFile(directory_entry& entry, bool skipCheck) { //selects given entry
   if (! skipCheck) {
-    for (int i = 0; i < children.size(); i++) {
-      if (children[i] == path) {
-        return selectPath(i);
+    for (int i = 0; i < currentFilesFiltered->size(); i++) {
+      if (*(*currentFilesFiltered)[i] == entry) {
+        return selectFile(i); //calls selectFile(int) if file found in currentFilesFiltered
       }
     }
   }
-  if (path == selectedPath || ! exists(path)) {
-    return false;
+  if (*selectedFile == entry || ! entry.exists()) {
+    return false; //returns false if file does not exist or file already selected
   }
-  selectedPath = path;
-  selected = -1;
-  return true;
-}
-
-bool FileManager::selectPath() {
-  if (selected < 0 || selected >= children.size()) {
-    return false;
-  }
-  selectedPath = children[selected].path();
+  //file not found in currentFilesFiltered
+  *selectedFile = entry;
+  selectedIndex = -1;
   updateSelectedData();
   return true;
 }
 
-bool FileManager::selectPath(int index) {
-  if (selected == -1) {
-    selected = 0;
+bool FileManager::selectFile(path& path, bool skipCheck) { //calls selectFile(directory_entry&, bool)
+  directory_entry entry(path);
+  return selectFile(entry, skipCheck);
+}
+
+bool FileManager::selectFile() { //calls selectedFile(int)
+  if (selectedIndex == -1) {
+    selectedIndex = 0;
   }
-  int oldIndex = selected;
-  selected = index;
-  if (! selectPath()) {
-    selected = oldIndex;
-    return false;
+  return selectFile(selectedIndex);
+}
+
+bool FileManager::selectFile(int index) { //will select the file at index
+  if (index < 0 || index >= currentFilesFiltered->size()) {
+    return false; //returns false if index out of range
   }
+  *selectedFile = *(*currentFilesFiltered)[index];
   return true;
 }
 
-bool FileManager::incrementSelected(bool cycle=true) {
-  if (selected == -1) {
-    selected = 0;
+bool FileManager::incrementSelected(bool cycle=true) { //selects index + 1
+  if (selectedIndex == -1) {
+    selectedIndex = 0;
   }
-  if (selected + 1 >= children.size()) {
-    return selectPath(0);
+  if (selectedIndex + 1 >= currentFilesFiltered->size()) {
+    return cycle && selectFile(0); //selects 0th element if cycle is true and index = size() - 1
   }
-  return selectPath(selected + 1);
+  return selectFile(selectedIndex + 1);
 }
 
-bool FileManager::decrementSelected(bool cycle=true) {
-  if (selected == -1) {
-    selected = 0;
+bool FileManager::decrementSelected(bool cycle=true) { //selects index - 1
+  if (selectedIndex == -1) {
+    selectedIndex = 0;
   }
-  if (selected == 0) {
-    if (children.size() == 0) {
-      return false;
+  if (selectedIndex == 0) {
+    return cycle && selectFile(currentFilesFiltered->size() - 1); //selects (n-1)th index if cycle is true and index = 0
+  }
+  return selectFile(selectedIndex - 1);
+}
+
+bool FileManager::selectParentDir(bool overRide) { //selects parent directory of currentPath
+  if (! overRide && selectedIndex == -1) { //skips if overRide is true
+    return selectedFile->path() == currentPath->parent_path(); //returns if already selected parent directory
+  }
+  path path = currentPath->parent_path();
+  return selectFile(path, true);
+}
+
+bool FileManager::isSelectedDirectory() { //returns true if selectedFile is a directory
+  return selectedFile->is_directory();
+}
+
+vector<directory_entry>::const_iterator FileManager::selectedFilesBegin() { //return cbegin of selectedFileChildren if selectedFile is a directory
+  if (! selectedFile->is_directory()) {
+    return selectedFileChildren->cend();
+  }
+  return selectedFileChildren->cbegin();
+}
+
+vector<directory_entry>::const_iterator FileManager::selectedFilesEnd() { //returns cend of selectedFileChildren
+  return selectedFileChildren->cend();
+}
+
+const string& FileManager::getSelectedFileContent() { //returns content of selectedFile if it is not a directory
+  if (selectedFile->is_directory()) {
+    return NULL;
+  }
+  return *selectedFileContent;
+}
+
+const path& FileManager::switchPath(directory_entry& entry, bool skipCheck) { //changes currentPath to give path
+  if (! entry.is_directory()) {
+    return *currentPath; //return if given path is not a directory
+  }
+  *selectedFile = directory_entry(*currentPath);
+  *currentPath = selectedFile->path();
+  currentFiles->clear();
+  selectedIndex = -1;
+  if (! skipCheck) {
+    for (const auto& dir_entry : directory_iterator(*currentPath)) {
+      currentFiles->push_back(entry);
+      if (dir_entry == *selectedFile) {
+        selectedIndex = currentFiles->size() - 1; //previous currentPath found in new directory
+      }
     }
-    return selectPath(children.size() - 1);
   }
-  return selectPath(selected - 1);
+  selectedIndex = selectedIndex == -1 ? 0 : selectedIndex;
+  selectFile();
+  return *currentPath;
 }
 
-bool FileManager::selectParentDir() {
-  if (selected == -1) {
-    return selectedPath == currentPath.parent_path();
-  }
-  return selectPath(currentPath.parent_path(), true);
+const path& FileManager::switchPath(path& path, bool skipCheck) { //calls switchPath(directory_entry&, bool)
+  directory_entry entry(path);
+  return switchPath(entry, skipCheck);
 }
 
-variant<vector<directory_entry>, string> FileManager::getSelectedData() {
-  return selectedData;
+const path& FileManager::switchPath() { //calls switchPath(directory_entry&, bool)
+  return switchPath(*selectedFile, false);
 }
 
-path FileManager::switchPath(path path) {
-  if (selectPath(path, true)) {
-    return switchPath();
-  }
-  return currentPath;
+const path& FileManager::switchToParent() { //calls switchPath(directory_entry&, bool)
+  directory_entry entry(currentPath->parent_path());
+  return switchPath(entry, false);
 }
 
-path FileManager::switchPath() {
-  currentPath = selectedPath;
-  children.clear();
-  int selectedIndex = -1;
-  for (const auto& entry : directory_iterator(currentPath)) { //todo: use updateChildren function instead
-    children.push_back(entry);
-    if (entry.path() == selectedPath) {
-      selectedIndex = children.size() - 1;
-    }
-  }
-
-  selectedPath = NULL;
-  selected = selectedIndex == -1 ? 0 : selectedIndex;
-  selectPath();
-  return currentPath;
-}
-
-path FileManager::switchToParent() {
-  if (selectParentDir()) {
-    return switchPath();
-  }
-  return currentPath;
-}
-
-FileManager::~FileManager() {}
+FileManager::~FileManager() {} //destructor
