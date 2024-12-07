@@ -16,16 +16,16 @@ enum FilterType {
 
 class FileManager {
 private:
-  path *currentPath; //path of current directory
-  vector<directory_entry> *currentFiles; //vector of files in current directory
-  vector<directory_entry*> *currentFilesFiltered; //vector of files in current directory with filter applied
+  path currentPath; //path of current directory
+  vector<directory_entry> currentFiles; //vector of files in current directory
+  vector<directory_entry*> currentFilesFiltered; //vector of files in current directory with filter applied
 
-  directory_entry *selectedFile; //user selected file
+  directory_entry selectedFile; //user selected file
   int selectedIndex; //index of selectedPath
 
-  vector<directory_entry> *selectedFileChildren; //vector of children of selected files (if selected file is a directory)
-  vector<directory_entry*> *selectedFileChildrenFiltered; //vector of children of selected files (if selected file is a directory)
-  string *selectedFileContent; //content of selected file(if selected file is not a directory)
+  vector<directory_entry> selectedFileChildren; //vector of children of selected files (if selected file is a directory)
+  vector<directory_entry*> selectedFileChildrenFiltered; //vector of children of selected files (if selected file is a directory)
+  string selectedFileContent; //content of selected file(if selected file is not a directory)
 
   void updateFiles(vector<directory_entry>&, const directory_entry&); //fills the vector with files from the specified directory
   void updateFiles(vector<directory_entry>&, const path&); //fills the vector with files from the specified path
@@ -37,9 +37,9 @@ private:
   bool applyNoneFilter(); //apply NONE filter
 
 public:
-  FileManager(directory_entry&); //constructor, initializes at given directory
+  FileManager(const directory_entry&); //constructor, initializes at given directory
   FileManager(); //constructor, initializes at current directory
-  FileManager(path&); //constructor, initializes at given path
+  FileManager(const path&); //constructor, initializes at given path
 
   const path& getCurrentPath(); //gets the current directory program is in
 
@@ -52,8 +52,8 @@ public:
   bool selectFile(path&, bool skipCheck=false); //selelcts the given file
   bool selectFile(); //updates the selected file based on index
   bool selectFile(int); //updates the index and selected file
-  bool incrementSelected(bool); //selects next file in the current directory
-  bool decrementSelected(bool); //selects previous file in the current directory
+  bool incrementSelected(bool cycle=true); //selects next file in the current directory
+  bool decrementSelected(bool cycle=true); //selects previous file in the current directory
   bool selectParentDir(bool overRide=false); //selects the parent directory
   
   bool isSelectedDirectory(); //returns true if selected file is a directory
@@ -62,7 +62,7 @@ public:
   vector<directory_entry*>::const_iterator selectedFilesEnd(); //end of const iterator to read files in selected file
   const string& getSelectedFileContent(); //returns content of selected file
 
-  const path& switchPath(directory_entry&, bool skipCheck=false); //switchs to given directory
+  const path& switchPath(const directory_entry, bool skipCheck=false); //switchs to given directory
   const path& switchPath(path&, bool skipCheck=false); //switchs to given path
   const path& switchPath(); //switches to selected directory (selectedPath)
   const path& switchToParent(); //switches to parent directory
