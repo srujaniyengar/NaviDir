@@ -3,6 +3,9 @@
 #include <filesystem>
 #include <vector>
 #include <string>
+#include <cstddef>
+#include <cstdio>
+#include <fstream>
 
 using namespace std::filesystem;
 using namespace std;

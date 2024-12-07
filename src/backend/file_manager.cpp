@@ -1,13 +1,4 @@
 #include "file_manager.h"
-#include <cstddef>
-#include <cstdio>
-#include <filesystem>
-#include <fstream>
-#include <string>
-#include <vector>
-
-using namespace std::filesystem;
-using namespace std;
 
 void FileManager::updateFiles(vector<directory_entry>& vec, const directory_entry& entry) { //clears the vector and fills it with files from given directory
   vec.clear();
