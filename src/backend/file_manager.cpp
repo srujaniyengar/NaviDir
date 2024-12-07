@@ -163,18 +163,19 @@ const path& FileManager::switchPath(directory_entry& entry, bool skipCheck) { //
     return *currentPath; //return if given path is not a directory
   }
   *selectedFile = directory_entry(*currentPath);
-  *currentPath = selectedFile->path();
-  currentFiles->clear();
-  selectedIndex = -1;
+  *currentPath = entry.path();
+  selectedIndex = 0;
   if (! skipCheck) {
+    currentFiles->clear();
     for (const auto& dir_entry : directory_iterator(*currentPath)) {
       currentFiles->push_back(entry);
       if (dir_entry == *selectedFile) {
         selectedIndex = currentFiles->size() - 1; //previous currentPath found in new directory
       }
     }
+  } else {
+    updateFiles(*currentFiles, *currentPath);
   }
-  selectedIndex = selectedIndex == -1 ? 0 : selectedIndex;
   selectFile();
   return *currentPath;
 }
