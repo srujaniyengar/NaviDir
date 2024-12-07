@@ -27,6 +27,7 @@ void FileManager::updateFiles(vector<directory_entry>& vec, const path& path) { 
 void FileManager::updateSelectedData() { //updates selectedFileChildren or selectedFileContent depending on selectedFile type
   if (selectedFile->is_directory()) {
     updateFiles(*selectedFileChildren, (selectedFile->path())); //fills the vector with files if selectedFile is a directory
+    applyFilterSelected(NONE);
   } else { //writes the content of selectedFile to selectedFileContent if it is not a directory
     ifstream file (selectedFile->path());
     if (!file) {
@@ -39,6 +40,22 @@ void FileManager::updateSelectedData() { //updates selectedFileChildren or selec
     }
     *selectedFileContent = content;
   }
+}
+
+bool FileManager::applyNoneFilterCurrent() { //fills the filter vector with pointer to all the files
+  currentFilesFiltered->clear();
+  for (directory_entry entry : *currentFiles) {
+    currentFilesFiltered->push_back(&entry);
+  }
+  return true;
+}
+
+bool FileManager::applyNoneFilterSelected() { //fills the filter vector with pointer to all the files
+  selectedFileChildrenFiltered->clear();
+  for (directory_entry entry : *selectedFileChildren) {
+    selectedFileChildrenFiltered->push_back(&entry);
+  }
+  return true;
 }
 
 FileManager::FileManager(directory_entry& entry) { //calls switchPath and initializes class in given directory
@@ -140,15 +157,15 @@ bool FileManager::isSelectedDirectory() { //returns true if selectedFile is a di
   return selectedFile->is_directory();
 }
 
-vector<directory_entry>::const_iterator FileManager::selectedFilesBegin() { //return cbegin of selectedFileChildren if selectedFile is a directory
+vector<directory_entry*>::const_iterator FileManager::selectedFilesBegin() { //return cbegin of selectedFileChildrenFiltered if selectedFile is a directory
   if (! selectedFile->is_directory()) {
-    return selectedFileChildren->cend();
+    return selectedFileChildrenFiltered->cend();
   }
-  return selectedFileChildren->cbegin();
+  return selectedFileChildrenFiltered->cbegin();
 }
 
-vector<directory_entry>::const_iterator FileManager::selectedFilesEnd() { //returns cend of selectedFileChildren
-  return selectedFileChildren->cend();
+vector<directory_entry*>::const_iterator FileManager::selectedFilesEnd() { //returns cend of selectedFileChildrenFiltered
+  return selectedFileChildrenFiltered->cend();
 }
 
 const string& FileManager::getSelectedFileContent() { //returns content of selectedFile if it is not a directory
@@ -176,6 +193,7 @@ const path& FileManager::switchPath(directory_entry& entry, bool skipCheck) { //
   } else {
     updateFiles(*currentFiles, *currentPath);
   }
+  applyFilterCurrent(NONE);
   selectFile();
   return *currentPath;
 }
@@ -192,6 +210,24 @@ const path& FileManager::switchPath() { //calls switchPath(directory_entry&, boo
 const path& FileManager::switchToParent() { //calls switchPath(directory_entry&, bool)
   directory_entry entry(currentPath->parent_path());
   return switchPath(entry, false);
+}
+
+bool FileManager::applyFilter(FilterType type) { //applies filter to both current and selected 
+  return applyFilterCurrent(type) && applyFilterSelected(type);
+}
+
+bool FileManager::applyFilterCurrent(FilterType type) { //calls respective filters
+  if (type == NONE) {
+    return applyNoneFilterCurrent();
+  }
+  return false;
+}
+
+bool FileManager::applyFilterSelected(FilterType type) { //calls respective filters
+  if (type == NONE) {
+    return applyNoneFilterSelected();
+  }
+  return false;
 }
 
 FileManager::~FileManager() {} //destructor

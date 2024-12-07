@@ -1,12 +1,15 @@
 #ifndef FILE_MANAGER_H
 #define FILE_MANAGER_H
 #include <filesystem>
-#include <variant>
 #include <vector>
 #include <string>
 
 using namespace std::filesystem;
 using namespace std;
+
+enum FilterType {
+  NONE,
+};
 
 class FileManager {
 private:
@@ -18,12 +21,17 @@ private:
   int selectedIndex; //index of selectedPath
 
   vector<directory_entry> *selectedFileChildren; //vector of children of selected files (if selected file is a directory)
+  vector<directory_entry*> *selectedFileChildrenFiltered; //vector of children of selected files (if selected file is a directory)
   string *selectedFileContent; //content of selected file(if selected file is not a directory)
 
   void updateFiles(vector<directory_entry>&, const directory_entry&); //fills the vector with files from the specified directory
   void updateFiles(vector<directory_entry>&, const path&); //fills the vector with files from the specified path
 
   void updateSelectedData(); //updates selectedFilesChildren or selectedFileContent depending on selected file type
+  
+  bool applyNoneFilterCurrent();
+  bool applyNoneFilterSelected();
+  bool applyNoneFilter(); //apply NONE filter
 
 public:
   FileManager(directory_entry&); //constructor, initializes at given directory
@@ -47,14 +55,18 @@ public:
   
   bool isSelectedDirectory(); //returns true if selected file is a directory
 
-  vector<directory_entry>::const_iterator selectedFilesBegin(); //begin of const iterator to read files in selected file
-  vector<directory_entry>::const_iterator selectedFilesEnd(); //end of const iterator to read files in selected file
+  vector<directory_entry*>::const_iterator selectedFilesBegin(); //begin of const iterator to read files in selected file
+  vector<directory_entry*>::const_iterator selectedFilesEnd(); //end of const iterator to read files in selected file
   const string& getSelectedFileContent(); //returns content of selected file
 
   const path& switchPath(directory_entry&, bool skipCheck=false); //switchs to given directory
   const path& switchPath(path&, bool skipCheck=false); //switchs to given path
   const path& switchPath(); //switches to selected directory (selectedPath)
   const path& switchToParent(); //switches to parent directory
+  
+  bool applyFilter(FilterType); //applies filter to files in currentFiles and selectedFileChildren
+  bool applyFilterCurrent(FilterType); //applies filter to files in currentFiles
+  bool applyFilterSelected(FilterType); //applies filter to files in selectedFileChildren
 
   ~FileManager(); //destructor, does nothing as of now
 };
