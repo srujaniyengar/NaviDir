@@ -6,6 +6,6 @@ add_executable(NaviDir main.cpp)
 target_link_libraries(NaviDir PRIVATE frontend backend ftxui)
 
 target_include_directories(NaviDir PRIVATE
-    ${CMAKE_SOURCE_DIR}/src/frontend
-    ${CMAKE_SOURCE_DIR}/src/backend
+  ${CMAKE_SOURCE_DIR}/src/frontend
+  ${CMAKE_SOURCE_DIR}/src/backend
 )
