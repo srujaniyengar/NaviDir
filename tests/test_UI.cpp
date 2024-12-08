@@ -2,5 +2,5 @@
 #include "../src/frontend/UI.h"
 
 TEST(UITests, ExampleTest) {
-    EXPECT_TRUE(true);
+  EXPECT_TRUE(true);
 }
