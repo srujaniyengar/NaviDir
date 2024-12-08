@@ -1,4 +1,4 @@
-#include "file_manager.h"
+#include "FileManager.h"
 
 void FileManager::updateFiles(vector<directory_entry>& vec, const directory_entry& entry) { //clears the vector and fills it with files from given directory
   vec.clear();
