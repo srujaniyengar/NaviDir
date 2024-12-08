@@ -11,6 +11,6 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(lib)
 add_subdirectory(src)
-# add_subdirectory(tests)
+add_subdirectory(tests)
 
 enable_testing()
