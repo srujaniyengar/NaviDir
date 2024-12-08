@@ -109,6 +109,7 @@ bool FileManager::selectFile(int index) { //will select the file at index
   }
   selectedIndex = index;
   selectedFile = *(currentFilesFiltered)[index];
+  updateSelectedData();
   return true;
 }
 
