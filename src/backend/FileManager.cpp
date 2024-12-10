@@ -35,13 +35,18 @@ void FileManager::updateSelectedData() { //updates selectedFileChildren or selec
 
 bool FileManager::applyNoneFilterCurrent() { //fills the filter vector with pointer to all the files
   currentFilesFiltered.clear();
+  currentFilesString.clear();
   for (directory_entry &entry : currentFiles) {
     currentFilesFiltered.push_back(&entry);
+    currentFilesString.push_back(entry.path().string()); //todo: call formatString from forntend to add any icon/color to the string
   }
   return true;
 }
 
 bool FileManager::applyNoneFilterSelected() { //fills the filter vector with pointer to all the files
+  if (! selectedFile.is_directory()) {
+    return false;
+  }
   selectedFileChildrenFiltered.clear();
   for (directory_entry &entry : selectedFileChildren) {
     selectedFileChildrenFiltered.push_back(&entry);
@@ -67,6 +72,10 @@ vector<directory_entry*>::const_iterator FileManager::filesBegin() { //returns c
 
 vector<directory_entry*>::const_iterator FileManager::filesEnd() { //returns cend of currentFilesFiltered
   return currentFilesFiltered.cend();
+}
+
+vector<string> *FileManager::getCurrentFilesString() { //returns pointer to currentFilesString
+  return &currentFilesString;
 }
 
 const directory_entry& FileManager::getSelectedFile() { //returns selectedFile

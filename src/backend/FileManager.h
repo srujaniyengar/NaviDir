@@ -19,6 +19,7 @@ private:
   path currentPath; //path of current directory
   vector<directory_entry> currentFiles; //vector of files in current directory
   vector<directory_entry*> currentFilesFiltered; //vector of files in current directory with filter applied
+  vector<string> currentFilesString;
 
   directory_entry selectedFile; //user selected file
   int selectedIndex; //index of selectedPath
@@ -32,8 +33,8 @@ private:
 
   void updateSelectedData(); //updates selectedFilesChildren or selectedFileContent depending on selected file type
   
-  bool applyNoneFilterCurrent();
-  bool applyNoneFilterSelected();
+  bool applyNoneFilterCurrent(); //apply NONE filter for current files
+  bool applyNoneFilterSelected(); //apply NONE filter for files in selected file if directory
   bool applyNoneFilter(); //apply NONE filter
 
 public:
@@ -45,6 +46,7 @@ public:
 
   vector<directory_entry*>::const_iterator filesBegin(); //begin of const iterator to read files in current directory
   vector<directory_entry*>::const_iterator filesEnd(); //end of const iterator to read files in current directory
+  vector<string>* getCurrentFilesString(); //gets pointer to vector of current file names
   
   const directory_entry& getSelectedFile(); //gets selected file
 
