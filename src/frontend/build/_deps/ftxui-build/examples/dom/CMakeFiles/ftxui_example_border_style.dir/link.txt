@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/ftxui_example_border_style.dir/link.d CMakeFiles/ftxui_example_border_style.dir/border_style.cpp.o -o ftxui_example_border_style  ../../libftxui-dom.a ../../libftxui-screen.a

@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/ftxui_example_vflow.dir/link.d CMakeFiles/ftxui_example_vflow.dir/vflow.cpp.o -o ftxui_example_vflow  ../../libftxui-dom.a ../../libftxui-screen.a

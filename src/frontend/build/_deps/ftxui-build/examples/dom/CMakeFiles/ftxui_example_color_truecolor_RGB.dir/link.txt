@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/ftxui_example_color_truecolor_RGB.dir/link.d CMakeFiles/ftxui_example_color_truecolor_RGB.dir/color_truecolor_RGB.cpp.o -o ftxui_example_color_truecolor_RGB  ../../libftxui-dom.a ../../libftxui-screen.a

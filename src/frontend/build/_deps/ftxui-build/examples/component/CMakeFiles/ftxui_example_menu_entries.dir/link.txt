@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/ftxui_example_menu_entries.dir/link.d CMakeFiles/ftxui_example_menu_entries.dir/menu_entries.cpp.o -o ftxui_example_menu_entries  ../../libftxui-component.a ../../libftxui-dom.a ../../libftxui-screen.a

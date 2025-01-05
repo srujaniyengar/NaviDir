@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/ftxui_example_color_info_palette256.dir/link.d CMakeFiles/ftxui_example_color_info_palette256.dir/color_info_palette256.cpp.o -o ftxui_example_color_info_palette256  ../../libftxui-dom.a ../../libftxui-screen.a

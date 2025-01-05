@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/ftxui_example_package_manager.dir/link.d CMakeFiles/ftxui_example_package_manager.dir/package_manager.cpp.o -o ftxui_example_package_manager  ../../libftxui-dom.a ../../libftxui-screen.a

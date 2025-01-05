@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/ftxui_example_vbox_hbox.dir/link.d CMakeFiles/ftxui_example_vbox_hbox.dir/vbox_hbox.cpp.o -o ftxui_example_vbox_hbox  ../../libftxui-dom.a ../../libftxui-screen.a

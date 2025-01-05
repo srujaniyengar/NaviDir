@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.11)
 project(frontend)
 
@@ -9,8 +8,7 @@ FetchContent_Declare(ftxui
 )
 FetchContent_MakeAvailable(ftxui)
 
-add_executable(frontend 
-    main.cpp
+add_library(frontend STATIC
     UI.cpp
 )
 
@@ -24,3 +22,13 @@ target_include_directories(frontend PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_executable(frontend_test
+    localTest.cpp
+)
+
+target_link_libraries(frontend_test PRIVATE
+    frontend
+    ftxui::screen
+    ftxui::dom
+    ftxui::component
+)

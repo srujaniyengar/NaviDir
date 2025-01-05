@@ -1,0 +1,3 @@
+/home/Srujan/NaviDirSSH/NaviDir/src/frontend/build/_deps/ftxui-subbuild/CMakeFiles/ftxui-populate.dir
+/home/Srujan/NaviDirSSH/NaviDir/src/frontend/build/_deps/ftxui-subbuild/CMakeFiles/edit_cache.dir
+/home/Srujan/NaviDirSSH/NaviDir/src/frontend/build/_deps/ftxui-subbuild/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/ftxui_example_gauge_direction.dir/link.d CMakeFiles/ftxui_example_gauge_direction.dir/gauge_direction.cpp.o -o ftxui_example_gauge_direction  ../../libftxui-dom.a ../../libftxui-screen.a
